@@ -1,0 +1,5 @@
+Category.create(all_category: "Mobiles")
+Category.create(all_category: "Bikes")
+Category.create(all_category: "Cars")
+Category.create(all_category: "Electronics & Appliances")
+Category.create(all_category: "Furniture")
