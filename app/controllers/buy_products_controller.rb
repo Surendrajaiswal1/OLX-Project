@@ -3,21 +3,8 @@ class BuyProductsController < ApplicationController
 
   def show_available_product
     product= SellProduct.all
-    result=[]
     if product
-      product.each do |products|
-        if products.status=="available"
-          h = Hash.new 
-          h[:name] = products.name
-          h[:image] = products.image.url
-          h[:price] = products.price
-          name = Category.find_by(id: products.category_id)
-          h[:category_id]=  products.category_id
-          h[:category_name]=name.all_category
-          result.push(h)
-        end
-      end
-      render json: result
+      render json: product
     else
       render json: {message: "NO PRODUCT AVAILABLE"}
     end
@@ -35,7 +22,7 @@ class BuyProductsController < ApplicationController
     if buy.save && data=="available"
       buy_data = buy.sell_product_id
       update_status(buy_data)
-      render json: {message: "Purchase Product successfully"}
+      render json: buy
     else
      render json: {message: "Product is no more available"}
     end
@@ -44,20 +31,7 @@ class BuyProductsController < ApplicationController
   def index
     purchase_data= @current_user.buy_products.all
     unless purchase_data.nil?
-      history= []
-      purchase_data.each do |data|
-        buy_data = data.sell_product_id
-        buy_data = SellProduct.find_by(id: buy_data)
-        h = Hash.new 
-        h[:name] = buy_data.name
-        h[:image] = buy_data.image.url
-        h[:price] = buy_data.price
-        @name = Category.find_by(id: buy_data.category_id)
-        h[:category_id]=  buy_data.category_id
-        h[:category_name]=@name.all_category
-        history.push(h)
-      end
-      render json: history
+      render json: purchase_data
     else
      render json: {message: "No purchase product"}
    end
