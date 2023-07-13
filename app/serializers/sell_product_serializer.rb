@@ -6,6 +6,6 @@ class SellProductSerializer < ActiveModel::Serializer
   end 
 
   def category
-    object.category.all_category
+    object.category.category_name
   end 
 end

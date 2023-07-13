@@ -1,42 +1,42 @@
 class CategoriesController < ApplicationController
+  before_action :get_category, only: [:update, :destroy]
+
   def index
-    category= Category.all
-    if category
-      render json: category
-    else
+    categories = Category.all
+
+    if categories
+      render json: categories
+    else 
       render json: {message: "No category found"}
     end
   end
 
   def create
-    category=Category.new(set_params)
-    if category.save
-      render json: category
-    else
+    create_category = Category.new(set_params)
+    return render json: create_category if create_category.save
       render json: {error: "No category created"}
-    end
   end
 
   def update
-    category=Category.find(params[:id])
-    if category.update(set_params)
-      render json: category
-    else
-      render json: {message: "Updation failed"}
-    end
+    return render json: @category if @category.update(set_params)
+    render json: {message: "Updation failed"}
   end
 
   def destroy
-    category=Category.find(params[:id])
-    if category.destroy
-      render json: category
-    else
-      renser json: {message: "Could not destroy"}
-    end
+    return render json: @category if @category.destroy
+    render json: {message: "Category deletion failed"}
   end
 
   private
+
     def set_params
-      params.permit(:all_category)
+      params.permit(:category_name)
+    end
+
+    def get_category
+      @category = Category.find_by(id: params[:id])
+      # rescue ActiveRecord::RecordNotFound
+      render json: {message: "ID not found"} unless @category.present?
+        
     end
 end

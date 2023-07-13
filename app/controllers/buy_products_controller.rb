@@ -2,85 +2,62 @@ class BuyProductsController < ApplicationController
   before_action :authenticate_request
 
   def show_available_product
-    product= SellProduct.all
-    if product
-      render json: product
-    else
-      render json: {message: "NO PRODUCT AVAILABLE"}
-    end
+    products = SellProduct.available
+    return render json: products unless products.nil? 
+    render json: {message: "NO PRODUCT AVAILABLE"}
   end
-   
+
   def show_data_category_wise
-    show_all = ActiveRecord::Base.connection.execute("select all_category, name,alphanumeric_id,price from categories inner join sell_products on sell_products.category_id = categories.id")
-    render json: show_all
+    show_products =  Category.all
+    render json: show_products
   end
-   
-  def purchase_product
-    buy= @current_user.buy_products.new(set_params)
-    data=SellProduct.find_by(id: params[:sell_product_id])
-    data= data.status
-    if buy.save && data=="available"
-      buy_data = buy.sell_product_id
-      update_status(buy_data)
-      render json: buy
-    else
-     render json: {message: "Product is no more available"}
-    end
- end
-   
+
+  def create
+    buy_product = @current_user.buy_products.new(set_params)
+    product_data = SellProduct.find_by(id: params[:sell_product_id])
+    return render json: {message: "Product is OUT OF STOCK"} if product_data.status == 'sold' || @current_user.id == product_data.user_id
+    buy_product.save
+    render json: buy_product
+  end
+
   def index
-    purchase_data= @current_user.buy_products.all
-    unless purchase_data.nil?
-      render json: purchase_data
-    else
-     render json: {message: "No purchase product"}
-   end
- end
+    purchase_product = @current_user.buy_products
+    return render json: purchase_product unless purchase_product.nil?
+    render json: {message: "ORDER HISTORY IS EMPTY"}
+  end
 
   def search_in_history
-    search=@current_user.buy_products.find_by(id: params[:id])
-    if search
-      history= []
-      buy_data = search.sell_product_id
-      buy_data = SellProduct.find_by(id: buy_data)
-      h = Hash.new 
-      h[:name] = buy_data.name
-      h[:image] = buy_data.image.url
-      h[:price] = buy_data.price
-      @name = Category.find_by(id: buy_data.category_id)
-      h[:category_id]=  buy_data.category_id
-      h[:category_name]=@name.all_category
-      history.push(h)
-      render json: history
-    else
-     render json: {message: "No purchase product from thid id"}
-   end
- end
-   
-  def search_by_category_and_name
-    if (params[:name] || params[:all_category])&&(!params[:name].blank? || !params[:all_category].blank?)
-      name=params[:name].strip if params[:name]
-      all_category=params[:all_category].strip if params[:all_category]
+    search = @current_user.buy_products.find_by(id: params[:id])
+    return render json: search if search
+    render json: {message: "NO SUCH ORDER FOUND"}
+  end
 
-      search_products =  ActiveRecord::Base.connection.execute("Select category_id,all_category,sell_products.id,name,price,status,description from categories inner join sell_products on sell_products.category_id=categories.id where sell_products.category_id=categories.id and all_category like '%#{all_category}%'and name like '%#{name}%'")
+  def search_by_category_and_name
+    if params[:name].present?  || params[:category_name].present?
+
+      name = params[:name].strip if params[:name]
+      category_name = params[:category_name].strip if params[:category_name]
+
+      search_products = SellProduct.joins(:category).where("category_name like '%#{category_name}%'and name like '%#{name}%'")
+
       if search_products.empty?
         render json: {error: 'Record not found'}
       else
-        render json: search_products
+        render json: search_products  
       end
     else
-      render json: {message: "Please provide required field"}
+      render json: {message: "FOR SEARCH THE PRODUCT ENTER NAME OR CATEGORY"}
     end
   end
-   
-  def update_status(data)
-    change=SellProduct.find(data)
-    change=change.update(status: "sold")
+
+  def update_status(product_id)
+    change_status = SellProduct.find(product_id)
+    change_status = change_status.update(status: 'sold')
   end
 
   private
-    def set_params
-      params.permit(:order_id, :contact_number, :sell_product_id)
-     end
+
+  def set_params
+    params.permit(:contact_number, :sell_product_id)
+  end
 end
-   

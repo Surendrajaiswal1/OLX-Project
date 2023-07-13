@@ -1,11 +1,23 @@
 class BuyProduct < ApplicationRecord
-  validates :contact_number,presence: true,:numericality => true,:length => { :minimum => 10, :maximum => 10 }
+  validates :contact_number, presence: true, :numericality => true, :length => { :minimum => 10, :maximum => 10 }
   belongs_to :user
   belongs_to :sell_product
-  before_save :order_id
+  before_save :unique_id
+  after_save :status_update
 
-  def order_id
-    self.order_id = SecureRandom.hex[0..7]
+  def unique_id
+   id = SecureRandom.hex[0..7]
+    products = BuyProduct.all
+    products.each do |product|
+      if product.order_id == id
+        unique_id
+      end
+    end
+    self.order_id = id
+  end
+
+  def status_update
+    self.sell_product.sold!
   end
 end
   

@@ -2,16 +2,23 @@ class SellProduct < ApplicationRecord
   validates :name,length: {minimum: 2}
   validates :image,presence: true
   validates :price,presence: true, :numericality => true
-  validates_inclusion_of :status, :in => ["available", "sold"]
   validates :description,presence: true,length: {minimum: 10}
   belongs_to :user
   belongs_to :category
-  has_many :buy_products,dependent: :destroy
+  has_many :buy_products, dependent: :destroy
   has_one_attached :image
-  before_save :before_save1
+  before_save :unique_id
+
+  enum status: [ :available, :sold ]
     
-    def before_save1
-      self.alphanumeric_id= SecureRandom.hex[0..7]
+  def unique_id
+    id = SecureRandom.hex[0..7]
+    products = SellProduct.all
+    products.each do |product|
+      if product.alphanumeric_id == id
+        unique_id
+      end
     end
+    self.alphanumeric_id = id
   end
-  
+end
