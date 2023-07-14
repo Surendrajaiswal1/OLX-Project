@@ -1,6 +1,6 @@
-class SellProductsController < ApplicationController
+class SellProductsController < ApiController
   before_action :authenticate_request
-  before_action :get_id, only: [:show, :update, :destroy]
+  before_action :get_product, only: [:show, :update, :destroy]
 
   def create
     create_product = @current_user.sell_products.new(set_params)
@@ -19,19 +19,18 @@ class SellProductsController < ApplicationController
   end
 
   def search_product 
-    if (params[:name].present? || params[:alphanumeric_id]).present?
-      
-      name = params[:name].strip if params[:name]
-      alphanumeric_id = params[:alphanumeric_id].strip if params[:alphanumeric_id]
-
-      search_products =  @current_user.sell_products.where("alphanumeric_id LIKE '%#{alphanumeric_id}%' and name LIKE '%#{name}%'")
-      if search_products.empty?
-        render json: {error: 'Record not found'}
-      else
-        render json: search_products
-      end
+    if params[:name].present?
+      name = params[:name].strip
+      products = @current_user.sell_products.where("name LIKE '%#{name}%'")
+      render json: products
+    elsif params[:alphanumeric_id].present?          
+      alphanumeric_id = params[:alphanumeric_id].strip
+      products = @current_user.sell_products.where("alphanumeric_id LIKE '%#{alphanumeric_id}%'")
+      render json: products
     else
-      render json: {message: "PLEASE PROVIDE VALID NAME OR ALPHANUMERIC_ID FOR SEARCH"}
+      all_products = @current_user.sell_products
+      return render json: all_products unless all_products.empty?
+      render json: {message: "NO PRODUCT AVAILABLE"}
     end
  end
 
@@ -50,10 +49,9 @@ class SellProductsController < ApplicationController
       params.permit(:name, :image, :status, :price, :description, :category_id)
     end
 
-    def get_id
-      @product = @current_user.sell_products.find(params[:id])
-      rescue ActiveRecord::RecordNotFound
-      render json: {message: "ID not found"}
+    def get_product
+      @product = @current_user.sell_products.find_by(id: params[:id])
+      render json: {message: "ID not found"} unless @product.present?
     end
 end
    

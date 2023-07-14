@@ -1,4 +1,4 @@
-class BuyProductsController < ApplicationController
+class BuyProductsController < ApiController
   before_action :authenticate_request
 
   def show_available_product
@@ -33,20 +33,18 @@ class BuyProductsController < ApplicationController
   end
 
   def search_by_category_and_name
-    if params[:name].present?  || params[:category_name].present?
-
-      name = params[:name].strip if params[:name]
-      category_name = params[:category_name].strip if params[:category_name]
-
-      search_products = SellProduct.joins(:category).where("category_name like '%#{category_name}%'and name like '%#{name}%'")
-
-      if search_products.empty?
-        render json: {error: 'Record not found'}
-      else
-        render json: search_products  
-      end
+    if params[:name].present? 
+      name = params[:name].strip 
+      search_products = SellProduct.joins(:category).where("name like '%#{name}%'")
+      render json: search_products 
+    elsif params[:category_name].present?  
+      category_name = params[:category_name].strip
+      search_products = SellProduct.joins(:category).where("category_name like '%#{category_name}%'")
+      render json: search_products 
     else
-      render json: {message: "FOR SEARCH THE PRODUCT ENTER NAME OR CATEGORY"}
+      products = SellProduct.available
+      return render json: products unless products.nil? 
+      render json: {message: "NO PRODUCT AVAILABLE"}   
     end
   end
 

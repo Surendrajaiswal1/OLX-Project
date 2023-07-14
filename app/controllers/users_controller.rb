@@ -1,5 +1,6 @@
-class UsersController < ApplicationController
+class UsersController < ApiController
   before_action :authenticate_request, only: [:update, :destroy]
+  before_action :get_user, only: [:show, :update, :destroy]
 
   def create
     sign_up = User.new(set_params)
@@ -17,35 +18,42 @@ class UsersController < ApplicationController
     end
   end
 
-  def show_all_users
+  def index
     users = User.all
     return render json: users unless users.empty?
       render json: {message: 'NO USERS AVAILABLE '}
   end
 
   def show
-    show_user = User.find(params[:id])
-    return render json: show_user if show_user
-      render json: {message: 'NO PARTICULAR USER FOUND'}
-    rescue ActiveRecord::RecordNotFound
-    render json: {message: 'ID not found'}
+    return render json: @user
   end
 
   def destroy
-    destroy_user = @current_user
-    return render json: {message: 'ACCOUNT DELETED', data: destroy_user} if destroy_user.destroy
-      render json: {message: 'NO PARTICULAR USER FOUND'}
+    if @current_user.id == @user.id
+      return render json: {message: 'ACCOUNT DELETED', data: @user} if @user.destroy
+        render json: {message: 'NO PARTICULAR USER FOUND'}
+    else
+      render json: {message: "PLEASE ENTER VALID ID"}
+    end
   end
 
-  def update
-    @update_user = @current_user
-    return render json: {message: 'YOU HAVE SUCCESSFULLY UPDATED YOUR ACCOUNT', data: @update_user} if @update_user.update(set_params)
-      render json: {data: @update_user.errors.full_messages, error: 'Updation Failed'}
+  def update    
+    if @current_user.id == @user.id
+      return render json: {message: 'YOU HAVE SUCCESSFULLY UPDATED YOUR ACCOUNT', data: @user} if @user.update(set_params)
+      render json: {data: update_user.errors.full_messages, error: 'Updation Failed'}
+    else 
+      render json: {message: "PLEASE ENTER VALID ID"}
+    end
   end
 
   private
   def set_params
     params.permit(:name, :email, :password)
+  end
+
+  def get_user
+    @user = User.find_by(id: params[:id])
+    render json: {message: "ID not found"} unless @user.present?
   end
 end
   

@@ -1,4 +1,4 @@
-class CategoriesController < ApplicationController
+class CategoriesController < ApiController
   before_action :get_category, only: [:update, :destroy]
 
   def index
@@ -35,7 +35,6 @@ class CategoriesController < ApplicationController
 
     def get_category
       @category = Category.find_by(id: params[:id])
-      # rescue ActiveRecord::RecordNotFound
       render json: {message: "ID not found"} unless @category.present?
         
     end

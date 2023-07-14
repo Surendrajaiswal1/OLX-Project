@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  devise_for :admin_users, ActiveAdmin::Devise.config
+  ActiveAdmin.routes(self)
   
   #......................SELL_PRODUCT.................................
   get 'sell_products/show_all', to: 'sell_products#show_all_products'
@@ -7,8 +9,7 @@ Rails.application.routes.draw do
 
   #.........................USER......................................
   post 'users/login'
-  get 'show_all_users', to: 'users#show_all_users'
-  resource :users
+  resources :users
 
   #.......................BUY_PRODUCT....................................
   get 'available/products', to: 'buy_products#show_available_product'
