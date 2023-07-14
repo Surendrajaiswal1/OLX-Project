@@ -1,6 +1,6 @@
 class UsersController < ApiController
-  before_action :authenticate_request, only: [:update, :destroy]
-  before_action :get_user, only: [:show, :update, :destroy]
+  before_action :authenticate_request, only: [ :update, :destroy ]
+  before_action :get_user, only: [ :show, :update, :destroy ]
 
   def create
     sign_up = User.new(set_params)

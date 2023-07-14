@@ -2,7 +2,7 @@ class BuyProductsController < ApiController
   before_action :authenticate_request
 
   def show_available_product
-    products = SellProduct.available
+    products = SellProduct.available.page(params[:page])
     return render json: products unless products.nil? 
     render json: {message: "NO PRODUCT AVAILABLE"}
   end
@@ -21,18 +21,6 @@ class BuyProductsController < ApiController
   end
 
   def index
-    purchase_product = @current_user.buy_products
-    return render json: purchase_product unless purchase_product.nil?
-    render json: {message: "ORDER HISTORY IS EMPTY"}
-  end
-
-  def search_in_history
-    search = @current_user.buy_products.find_by(id: params[:id])
-    return render json: search if search
-    render json: {message: "NO SUCH ORDER FOUND"}
-  end
-
-  def search_by_category_and_name
     if params[:name].present? 
       name = params[:name].strip 
       search_products = SellProduct.joins(:category).where("name like '%#{name}%'")
@@ -45,7 +33,17 @@ class BuyProductsController < ApiController
       products = SellProduct.available
       return render json: products unless products.nil? 
       render json: {message: "NO PRODUCT AVAILABLE"}   
-    end
+    end  
+  end
+
+  def search_in_history
+    search = @current_user.buy_products.find_by(id: params[:id])
+    return render json: search if search
+    render json: {message: "NO SUCH ORDER FOUND"}
+  end
+
+  def search_by_category_and_name
+   
   end
 
   def update_status(product_id)

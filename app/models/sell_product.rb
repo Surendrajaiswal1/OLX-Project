@@ -1,4 +1,5 @@
 class SellProduct < ApplicationRecord
+  paginates_per 2
   validates :name,length: {minimum: 2}
   validates :image,presence: true
   validates :price,presence: true, :numericality => true

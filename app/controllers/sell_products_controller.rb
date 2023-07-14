@@ -13,13 +13,7 @@ class SellProductsController < ApiController
   end
 
   def index
-    all_products = @current_user.sell_products
-    return render json: all_products unless all_products.empty?
-      render json: {message: "NO PRODUCT AVAILABLE"}
-  end
-
-  def search_product 
-    if params[:name].present?
+     if params[:name].present?
       name = params[:name].strip
       products = @current_user.sell_products.where("name LIKE '%#{name}%'")
       render json: products
@@ -28,11 +22,15 @@ class SellProductsController < ApiController
       products = @current_user.sell_products.where("alphanumeric_id LIKE '%#{alphanumeric_id}%'")
       render json: products
     else
-      all_products = @current_user.sell_products
+      all_products = @current_user.sell_products.page(params[:page])
       return render json: all_products unless all_products.empty?
       render json: {message: "NO PRODUCT AVAILABLE"}
     end
- end
+  end
+
+ #  def search_product 
+   
+ # end
 
   def update
     return render json: @product if @product.update(set_params)
