@@ -1,5 +1,5 @@
 class SellProductSerializer < ActiveModel::Serializer
-  attributes :id,:category, :name, :image, :alphanumeric_id, :price, :description
+  attributes :id,:category, :name, :image, :alphanumeric_id, :price, :description, :status
 
   def image
     object.image.url

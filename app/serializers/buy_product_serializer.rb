@@ -1,5 +1,5 @@
 class BuyProductSerializer < ActiveModel::Serializer
-  attributes :id, :order_id, :product_name, :price, :image
+  attributes :id, :order_id, :product_name, :price
 
   def product_name
     object.sell_product.name
@@ -9,7 +9,5 @@ class BuyProductSerializer < ActiveModel::Serializer
     object.sell_product.price
   end
 
-  def image
-    object.sell_product.image.url
-  end
+ 
 end

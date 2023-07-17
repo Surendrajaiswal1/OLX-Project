@@ -35,7 +35,7 @@ class CategoriesController < ApiController
 
     def get_category
       @category = Category.find_by(id: params[:id])
-      render json: {message: "ID not found"} unless @category.present?
+      render json: {message: "CATEGORY NOT FOUND"} unless @category.present?
         
     end
 end

@@ -28,10 +28,6 @@ class SellProductsController < ApiController
     end
   end
 
- #  def search_product 
-   
- # end
-
   def update
     return render json: @product if @product.update(set_params)
       render json: {message: "Updation failed"}
@@ -44,12 +40,12 @@ class SellProductsController < ApiController
 
  private
     def set_params
-      params.permit(:name, :image, :status, :price, :description, :category_id)
+      params.permit(:name, :price, :description, :category_id, :image)
     end
 
     def get_product
       @product = @current_user.sell_products.find_by(id: params[:id])
-      render json: {message: "ID not found"} unless @product.present?
+      render json: {message: "PRODUCT NOT FOUND"} unless @product.present?
     end
 end
    

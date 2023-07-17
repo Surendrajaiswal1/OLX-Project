@@ -1,11 +1,11 @@
-class UsersController < ApiController
+pclass UsersController < ApiController
   before_action :authenticate_request, only: [ :update, :destroy ]
   before_action :get_user, only: [ :show, :update, :destroy ]
 
   def create
     sign_up = User.new(set_params)
     return render json: {message: 'YOU HAVE SUCCESSFULLY REGISTERED'} if sign_up.save
-      render json: {data: sign_up.errors.full_messages}
+    render json: {data: sign_up.errors.full_messages}
   end
 
   def login
@@ -21,7 +21,7 @@ class UsersController < ApiController
   def index
     users = User.all
     return render json: users unless users.empty?
-      render json: {message: 'NO USERS AVAILABLE '}
+    render json: {message: 'NO USERS AVAILABLE '}
   end
 
   def show
@@ -31,7 +31,7 @@ class UsersController < ApiController
   def destroy
     if @current_user.id == @user.id
       return render json: {message: 'ACCOUNT DELETED', data: @user} if @user.destroy
-        render json: {message: 'NO PARTICULAR USER FOUND'}
+      render json: {message: 'NO PARTICULAR USER FOUND'}
     else
       render json: {message: "PLEASE ENTER VALID ID"}
     end
@@ -53,7 +53,7 @@ class UsersController < ApiController
 
   def get_user
     @user = User.find_by(id: params[:id])
-    render json: {message: "ID not found"} unless @user.present?
+    render json: {message: "USER NOT FOUND"} unless @user.present?
   end
 end
   

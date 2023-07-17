@@ -1,10 +1,22 @@
 class BuyProductsController < ApiController
   before_action :authenticate_request
 
-  def show_available_product
-    products = SellProduct.available.page(params[:page])
-    return render json: products unless products.nil? 
-    render json: {message: "NO PRODUCT AVAILABLE"}
+  def show_available_products   
+    if params[:name].present? 
+      name = params[:name].strip 
+      search_products = SellProduct.joins(:category).where("name like '%#{name}%'")
+      return render json: search_products if search_products.present?
+      render json: {message: "NO SUCH PRODUCT EXIST"}
+    elsif params[:category_name].present?  
+      category_name = params[:category_name].strip
+      search_products = SellProduct.joins(:category).where("category_name like '%#{category_name}%'")
+      return render json: search_products if search_products.present?
+      render json: {message: "NO SUCH PRODUCT EXIST"}
+    else
+      products = SellProduct.available.page(params[:page])
+      return render json: products unless products.nil? 
+      render json: {message: "NO PRODUCT AVAILABLE"}   
+    end
   end
 
   def show_data_category_wise
@@ -21,29 +33,11 @@ class BuyProductsController < ApiController
   end
 
   def index
-    if params[:name].present? 
-      name = params[:name].strip 
-      search_products = SellProduct.joins(:category).where("name like '%#{name}%'")
-      render json: search_products 
-    elsif params[:category_name].present?  
-      category_name = params[:category_name].strip
-      search_products = SellProduct.joins(:category).where("category_name like '%#{category_name}%'")
-      render json: search_products 
-    else
-      products = SellProduct.available
-      return render json: products unless products.nil? 
-      render json: {message: "NO PRODUCT AVAILABLE"}   
-    end  
-  end
-
-  def search_in_history
-    search = @current_user.buy_products.find_by(id: params[:id])
-    return render json: search if search
-    render json: {message: "NO SUCH ORDER FOUND"}
-  end
-
-  def search_by_category_and_name
-   
+    search_product = @current_user.buy_products.find_by(id: params[:id])
+    return render json: search_product if search_product.present?
+    purchase_product = @current_user.buy_products
+    return render json: purchase_product if purchase_product.present?
+    render json: {message: "ORDER HISTORY IS EMPTY"}
   end
 
   def update_status(product_id)

@@ -1,7 +1,6 @@
 class SellProduct < ApplicationRecord
   paginates_per 2
   validates :name,length: {minimum: 2}
-  validates :image,presence: true
   validates :price,presence: true, :numericality => true
   validates :description,presence: true,length: {minimum: 10}
   belongs_to :user
@@ -9,6 +8,7 @@ class SellProduct < ApplicationRecord
   has_many :buy_products, dependent: :destroy
   has_one_attached :image
   before_save :unique_id
+  before_save :status_update
 
   enum status: [ :available, :sold ]
     
@@ -21,5 +21,9 @@ class SellProduct < ApplicationRecord
       end
     end
     self.alphanumeric_id = id
+  end
+
+  def status_update
+    self.status = "available"
   end
 end

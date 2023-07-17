@@ -12,10 +12,9 @@ Rails.application.routes.draw do
   resources :users
 
   #.......................BUY_PRODUCT....................................
-  get 'available/products', to: 'buy_products#show_available_product'
+  get 'available/products', to: 'buy_products#show_available_products'
   get 'show/category', to: 'buy_products#show_data_category_wise'
   get 'search/history/:id', to: 'buy_products#search_in_history'
-  get 'search/category/name', to: 'buy_products#search_by_category_and_name'
   resources :buy_products
 
   #.......................CATEGORY....................................
