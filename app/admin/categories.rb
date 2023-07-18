@@ -1,5 +1,5 @@
 ActiveAdmin.register Category do
-  actions :index, :edit, :update, :create, :destroy
+  # actions :index, :edit, :update, :create, :destroy
 
   permit_params :id, :category_name
 
@@ -17,5 +17,12 @@ ActiveAdmin.register Category do
   #   permitted << :other if params[:action] == 'create' && current_user.admin?
   #   permitted
   # end
+  form do |f|
+    f.inputs "Category" do
+      f.input :category_name
+    end
+    f.actions
+  end
+
   
 end
