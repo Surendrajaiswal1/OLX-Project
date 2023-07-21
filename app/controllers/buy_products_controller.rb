@@ -45,7 +45,7 @@ class BuyProductsController < ApiController
     change_status = change_status.update(status: 'sold')
   end
 
-  private
+  private     
 
   def set_params
     params.permit(:contact_number, :sell_product_id)

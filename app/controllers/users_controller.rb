@@ -1,4 +1,4 @@
-pclass UsersController < ApiController
+class UsersController < ApiController
   before_action :authenticate_request, only: [ :update, :destroy ]
   before_action :get_user, only: [ :show, :update, :destroy ]
 
@@ -46,7 +46,7 @@ pclass UsersController < ApiController
     end
   end
 
-  private
+  private 
   def set_params
     params.permit(:name, :email, :password)
   end
