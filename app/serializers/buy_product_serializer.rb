@@ -8,6 +8,4 @@ class BuyProductSerializer < ActiveModel::Serializer
   def price
     object.sell_product.price
   end
-
- 
 end

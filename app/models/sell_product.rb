@@ -7,17 +7,17 @@ class SellProduct < ApplicationRecord
   belongs_to :category
   has_many :buy_products, dependent: :destroy
   has_one_attached :image
-  before_save :unique_id
+  before_save :set_unique_id
   before_save :status_update
 
   enum status: [ :available, :sold ]
     
-  def unique_id
+  def set_unique_id
     id = SecureRandom.hex[0..7]
     products = SellProduct.all
     products.each do |product|
       if product.alphanumeric_id == id
-        unique_id
+        set_unique_id
       end
     end
     self.alphanumeric_id = id

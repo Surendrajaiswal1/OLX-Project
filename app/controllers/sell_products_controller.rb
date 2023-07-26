@@ -5,7 +5,7 @@ class SellProductsController < ApiController
   def create
     create_product = @current_user.sell_products.new(set_params)
     return render json: create_product if create_product.save
-    render json: {error: create_product.errors.full_messages}
+    render json: { error: create_product.errors.full_messages }
   end
 
   def show
